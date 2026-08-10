@@ -1,0 +1,11 @@
+# Files that must never be copied into the Docker build. Keeping node_modules and .next out means
+# the build always installs and compiles fresh, instead of inheriting stale files from your laptop.
+node_modules
+.next
+.git
+.remember
+npm-debug.log*
+README.md
+Dockerfile
+.dockerignore
+.env*

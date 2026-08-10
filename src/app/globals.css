@@ -1,26 +1,103 @@
 @import "tailwindcss";
 
+/* Colour values live here once, so light and dark mode are the only two places to edit them. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f6f7;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --line: #e4e4e7;
+  --muted: #71717a;
+  --accent: #2563eb;
+  --success: #16a34a;
 }
 
+/* Follows whatever the operating system is set to. There is no in-app toggle: one fewer control
+   on screen, and the OS setting is what people actually use. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b0b0d;
+    --foreground: #ededf0;
+    --card: #16161a;
+    --line: #2a2a30;
+    --muted: #9a9aa4;
+    --accent: #60a5fa;
+    --success: #4ade80;
+  }
+}
+
+/* Registers the colours above as Tailwind utilities, so `bg-card` and `text-muted` work in the
+   components. Named --color-line rather than --color-border on purpose: Tailwind already uses
+   `border` for width utilities, and reusing the name causes conflicts. */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  /* 18px instead of the usual 16px. This gets read at arm's length in a control room, and every
+     Tailwind text size scales up from here. */
+  font-size: 18px;
+}
+
+/* --- Row animations ---------------------------------------------------------------------------
+   A new row rises into place and a deleted row drops away, so the list never changes silently and
+   you can see which row you just touched. */
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes row-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+}
+
+.row-in {
+  /* This curve overshoots slightly then settles, which reads as a physical object landing rather
+     than a box fading in. */
+  animation: row-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.row-out {
+  /* Faster than the entrance and eased the opposite way: leaving should feel decisive, not slow. */
+  animation: row-out 190ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+/* Respects the operating system's "reduce motion" accessibility setting. Durations drop to
+   effectively zero rather than 0, because the delete animation's end event is what actually
+   removes the row from the list. */
+@media (prefers-reduced-motion: reduce) {
+  .row-in,
+  .row-out {
+    animation-duration: 0.01ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
 }

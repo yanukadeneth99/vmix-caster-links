@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Scratch notes written by tooling, not part of the app.
+    ".remember/**",
   ]),
 ]);
 
